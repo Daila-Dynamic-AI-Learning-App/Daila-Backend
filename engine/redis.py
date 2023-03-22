@@ -6,10 +6,11 @@ class RedisClient:
         needed in the flask app
     """
     def __init__(self) -> None:
+        # start connection
         self.__client = redis.Redis()
 
 
-    def set(self, key, value):
+    def set(self, key, value) -> None:
         """
             function to set key and values
             in redis
@@ -23,7 +24,7 @@ class RedisClient:
         """
         return self.__client.get(key).decode('utf8')
 
-    def delete(self, key):
+    def delete(self, key) -> None:
         """
             function deletes a key from
             the redis db

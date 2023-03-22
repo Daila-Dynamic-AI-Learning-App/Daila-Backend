@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from typing import Union, Any, Dict
 
 
 class Db:
@@ -6,21 +7,21 @@ class Db:
         self.__client = MongoClient('localhost', 27017)
         self.__db = self.__client['test']
 
-    def addOne(self, collection, obj):
+    def addOne(self, collection: str, obj: Dict) -> None:
         """
             adds a collection with obj to the database
         """
         field = self.__db[collection]
         field.insert_one(obj)
 
-    def findOne(self, collection, obj):
+    def findOne(self, collection: str, obj: Dict) -> Union[Any, None]:
         """
             find one obj in collection in the database
         """
         field = self.__db[collection]
         return field.find_one(obj)
 
-    def deleteOne(self, collection, obj):
+    def deleteOne(self, collection: str, obj: Dict) -> None:
         """
             deletes a collection from the database
         """

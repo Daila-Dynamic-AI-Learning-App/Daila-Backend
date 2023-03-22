@@ -14,7 +14,7 @@ class Authorize:
         self.__db = database
         self.__redis = redis_client
 
-    def registerUser(self, obj: Dict):
+    def registerUser(self, obj: Dict) -> None:
         """
         takes user's email and password and creates an account
         else raise an error
@@ -43,7 +43,7 @@ class Authorize:
 
         self.__db.addOne('user', obj)
 
-    def loginUser(self, obj: Dict):
+    def loginUser(self, obj: Dict) -> str:
         """
         takes user's email and password and returns the
         user instance associated with it

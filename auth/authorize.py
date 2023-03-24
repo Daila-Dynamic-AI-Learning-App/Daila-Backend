@@ -60,13 +60,13 @@ class Authorize:
             raise ValueError('invalid email')
 
         # check if password is valid
-        if not checkpw(password.encode('utf8'), user.hashed_password.encode('utf8')):
+        if not checkpw(password.encode('utf8'), user.get("hashed_password").encode('utf8')):
             raise ValueError('incorrect password')
 
         # generate unique token to store in the redis db
         token = generate_uuid()
         # store user id with token in redis
-        self.__redis.set(token, str(user._id))
+        self.__redis.set(token, str(user.get("_id")))
 
         return token
 

@@ -1,11 +1,11 @@
 from pymongo import MongoClient
 from typing import Union, Any, Dict
-
+import keys
 
 class Db:
     def __init__(self) -> None:
-        self.__client = MongoClient('localhost', 27017)
-        self.__db = self.__client['test']
+        self.__client = MongoClient(f"mongodb+srv://{keys.DB_USER}:{keys.DB_SECRET}@cluster0.pho2egn.mongodb.net/?retryWrites=true&w=majority")
+        self.__db = self.__client[keys.DB_NAME]
 
     def addOne(self, collection: str, obj: Dict) -> None:
         """

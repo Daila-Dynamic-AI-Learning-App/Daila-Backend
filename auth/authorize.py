@@ -3,6 +3,7 @@ from utils.helper import hash_password, generate_uuid
 from bcrypt import checkpw
 from datetime import datetime
 from typing import Dict
+from bson import ObjectId
 
 
 class Authorize:
@@ -69,5 +70,18 @@ class Authorize:
         self.__redis.set(token, str(user.get("_id")))
 
         return token
+
+    def signOut(self, token: str) -> None:
+        """
+        takes the token given on login and
+        signs the user out
+        """
+        # get the user id
+        user_id = self.__redis.get(token)
+        if not user_id:
+            raise ValueError('User not present')
+
+        # if present, delete token
+        self.__redis.delete(token)
 
 AUTH = Authorize()

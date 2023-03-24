@@ -44,3 +44,20 @@ def loginUser():
         return jsonify(token=token), 200
     except ValueError:
         abort(400)
+
+@daila.route('/logout', methods=['GET'], strict_slashes=False)
+def logoutUser():
+    """
+        logout users
+    """
+    # custom header holds the token
+    token = request.headers.get('X-Token')
+    if not token:
+        abort(400)
+
+    try:
+        AUTH.signOut(token)
+        return '', 204
+    except ValueError:
+        # unauthorized to logout
+        abort(401)

@@ -8,7 +8,11 @@ class RedisClient:
     """
     def __init__(self) -> None:
         # start connection
-        self.__client = redis.Redis(host=keys.RED_HOST, port=keys.RED_PORT)
+        self.__client = redis.Redis(
+        host=keys.RED_HOST,
+        port=keys.RED_PORT,
+        password=keys.RED_PASS
+        )
 
 
     def set(self, key, value) -> None:

@@ -1,4 +1,5 @@
 import redis
+import keys
 
 class RedisClient:
     """
@@ -7,7 +8,7 @@ class RedisClient:
     """
     def __init__(self) -> None:
         # start connection
-        self.__client = redis.Redis()
+        self.__client = redis.Redis(host=keys.RED_HOST, port=keys.RED_PORT)
 
 
     def set(self, key, value) -> None:

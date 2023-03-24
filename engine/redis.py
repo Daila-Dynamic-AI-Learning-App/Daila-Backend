@@ -27,7 +27,11 @@ class RedisClient:
             function gets a paritcular key
             from redis
         """
-        return self.__client.get(key).decode('utf8')
+        value = self.__client.get(key)
+        if not value:
+            return None
+        return value.decode('utf8')
+
 
     def delete(self, key) -> None:
         """

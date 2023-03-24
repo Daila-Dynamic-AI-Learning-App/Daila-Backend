@@ -13,9 +13,9 @@ class RedisClient:
     def set(self, key, value) -> None:
         """
             function to set key and values
-            in redis
+            in redis with expiry time
         """
-        self.__client.set(key, value)
+        self.__client.setex(key, 43200, value)
 
     def get(self, key) -> str:
         """

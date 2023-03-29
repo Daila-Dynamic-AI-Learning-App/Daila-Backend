@@ -19,7 +19,7 @@ def getPrompt(user_input: str, end: bool) -> str:
             assistant_response: assistant's response
     """
     if end:
-       user_message = {'role': 'user', 'content': 'give links to the resources'}
+        user_message = {'role': 'user', 'content': 'give links to the resources'}
     else:
         user_message = {'role': 'user', 'content': user_input}
     redis_client.addToList('chat_log', user_message)

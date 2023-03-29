@@ -1,5 +1,7 @@
 import redis
 import keys
+from typing import Dict
+import json
 
 class RedisClient:
     """
@@ -39,3 +41,22 @@ class RedisClient:
             the redis db
         """
         self.__client.delete(key)
+
+    def addToList(self, list_name: str, content: Dict):
+        """
+            adds object to a list in redis
+        """
+        # convert content to string then bytes
+        json_str = json.dumps(content)
+        json_bytes = json_str.encode('utf-8')
+
+        # store json bytes in redis
+        self.__client.rpush(list_name, json_bytes)
+        # delete after one hour
+        self.__client.expire(list_name, 3600)
+
+    def allList(self, list_name: str):
+        """
+            returns all the contents of a list in redis
+        """
+        return self.__client.lrange(list_name, 0, -1)

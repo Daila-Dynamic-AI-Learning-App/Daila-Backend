@@ -3,7 +3,6 @@ from utils.helper import hash_password, generate_uuid
 from bcrypt import checkpw
 from datetime import datetime
 from typing import Dict
-from bson import ObjectId
 
 
 class Authorize:
@@ -66,8 +65,9 @@ class Authorize:
 
         # generate unique token to store in the redis db
         token = generate_uuid()
+        tok_key = 'auth_{}'.format(token)
         # store user id with token in redis
-        self.__redis.set(token, str(user.get("_id")))
+        self.__redis.set(tok_key, str(user.get("_id")))
 
         return token
 
@@ -77,11 +77,12 @@ class Authorize:
         signs the user out
         """
         # get the user id
-        user_id = self.__redis.get(token)
+        tok_key = 'auth_{}'.format(token)
+        user_id = self.__redis.get(tok_key)
         if not user_id:
             raise ValueError('User not present')
 
         # if present, delete token
-        self.__redis.delete(token)
+        self.__redis.delete(tok_key)
 
 AUTH = Authorize()

@@ -6,22 +6,20 @@ from engine import redis_client
 import re
 import keys
 import json
+from typing import Tuple
 
 openai.api_key = keys.OPEN_API_KEY
 
-def getPrompt(user_input: str, end: bool) -> str:
+def getPrompt(user_input: str) -> Tuple[str, bool]:
     """
-        Takes in user and/or assistant respnses to
-        be used in the openai module
+        Takes in user response and gives thw assistant's 
+        response
 
         Args:
             user_input: User's question
-            assistant_response: assistant's response
     """
-    if end:
-        user_message = {'role': 'user', 'content': 'give links to the resources'}
-    else:
-        user_message = {'role': 'user', 'content': user_input}
+    assesment = False
+    user_message = {'role': 'user', 'content': user_input}
     redis_client.addToList('chat_log', user_message)
 
     # decode bytes list in UTF-8
@@ -34,17 +32,26 @@ def getPrompt(user_input: str, end: bool) -> str:
     data = json.loads(json_string)
 
     response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        model="gpt-4",
         messages=data
     )
 
     assistant_response = response['choices'][0]['message']['content']
     stripped = assistant_response.strip('\n').strip()
+    
+    # regex to extract the questions in the assistant response
     pattern = r'.*\d:\s(.*\?)'
     result = re.findall(pattern, stripped)
 
+    assistant = { 'role': 'assistant', 'content': stripped }
+    redis_client.addToList('chat_log', assistant)
+
+    # check if the assessment is done
+    if stripped.startswith('End$'):
+        assesment = True
+        # remove the identifier from the stripped response
+        return (stripped[len('End$'):], assesment)
+
     if len(result) > 0:
-        assistant = { 'role': 'assistant', 'content': stripped }
-        redis_client.addToList('chat_log', assistant)
-        return result[0]
-    return stripped
+        return (result[0], assesment)
+    return (stripped, assesment)

@@ -65,6 +65,7 @@ def getFirstQuestion(studyId):
         # get answer from the body
         data = request.get_json()
         answer = data.get('answer')
+        end = False
 
         if answer is None:
             abort(400)
@@ -75,7 +76,8 @@ def getFirstQuestion(studyId):
             obj = {"_id": ObjectId(studyId)}
             update = {'$set': { 'assessment': prompt[0], 'updated_at': datetime.now() }}
             study = database.findUpdateOne('study', obj, update)
-        return jsonify({ 'prompt': prompt[0] }), 200
+            end = True
+        return jsonify({ 'prompt': prompt[0], 'end': end }), 200
 
 # @daila.route('/user/studies', methods=['GET'], strict_slashes=False)
 # def listUserStudy():

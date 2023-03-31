@@ -31,6 +31,7 @@ def loginUser():
     """
     # to be safer, load data to json
     data = request.get_json()
+    print(data)
     if not data:
         abort(400)
 

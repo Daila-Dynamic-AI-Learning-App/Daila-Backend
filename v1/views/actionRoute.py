@@ -55,30 +55,27 @@ def getFirstQuestion(studyId):
         study_year = study.get('year')
         country = user.get('country')
 
-        start_question = keys.QUERY_STRING.format(study_level, study_interest,
-                                                f'{study_level} {study_year}',
-                                                country, country, study_interest)
+        start_question = keys.QUERY_STRING.format(study_year, study_level,
+                                                study_interest, country)
 
-        prompt = getPrompt(start_question, False)
-        return jsonify({ 'prompt': prompt }), 200
+        prompt = getPrompt(start_question)
+        return jsonify({ 'prompt': prompt[0] }), 200
 
     if request.method == 'PUT':
         # get answer from the body
         data = request.get_json()
         answer = data.get('answer')
-        end = data.get('end')
 
-        if answer is None or end is None:
+        if answer is None:
             abort(400)
 
-        prompt = getPrompt(answer, end)
+        prompt = getPrompt(answer)
 
-        if end:
+        if prompt[1]:
             obj = {"_id": ObjectId(studyId)}
-            format_str = f'{answer}\n{prompt}'
-            update = {'$set': { 'assessment': format_str, 'updated_at': datetime.now() }}
+            update = {'$set': { 'assessment': prompt[0], 'updated_at': datetime.now() }}
             study = database.findUpdateOne('study', obj, update)
-        return jsonify({ 'prompt': prompt }), 200
+        return jsonify({ 'prompt': prompt[0] }), 200
 
 # @daila.route('/user/studies', methods=['GET'], strict_slashes=False)
 # def listUserStudy():

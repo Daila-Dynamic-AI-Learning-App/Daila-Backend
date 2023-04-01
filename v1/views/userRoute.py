@@ -1,7 +1,6 @@
 from v1.views import daila
 from flask import abort, jsonify, request, g
-from engine import database
-from bson import ObjectId
+from engine import database, redis_client
 
 
 @daila.route('/user/studies', methods=['GET'], strict_slashes=False)
@@ -54,4 +53,6 @@ def getDelUsers():
         
         # then delete the user
         database.delMany('user', { '_id': g.user_id })
+        # delete token from redis
+        redis_client.delete(g.token)
         return jsonify(), 204

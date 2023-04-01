@@ -23,6 +23,7 @@ def require_token():
         try:
             # get user's id and set to globals
             g.user_id  = TokenAuth.checkToken(token)
+            g.token = token
         except ValueError:
             # not authorized
             abort(401)

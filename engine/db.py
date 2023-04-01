@@ -42,6 +42,27 @@ class Db:
         field = self.__db[collection]
         return field.find_one_and_update(obj, update, return_document=ReturnDocument.AFTER)
 
+    def getFieldList(self, collection: str, match_obj: Dict, limit: int, page: int):
+        """
+            get a paginated list of matching object results
+            without the id
+            
+            Args:
+                collection: the field/collection to search in
+                match_obj: object to get match results from
+                limit: limit of results gotten
+                page: number to display a particular page
+        """
+        field = self.__db[collection]
+        # define the pipeline to search mongodb
+        pipeline = [
+            {'$match': match_obj },
+            { '$skip': page * limit },
+            { '$limit': limit },
+            { '$sort': { 'created_at': -1 } },
+            { '$project': { '_id': 0 } }
+        ]
+        return field.aggregate(pipeline)
 
 # data_b = Db()
 # elem = data_b.addOne('user', { 'name': 'foo', 'email': 'goo@g.com' })

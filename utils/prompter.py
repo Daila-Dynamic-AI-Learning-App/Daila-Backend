@@ -7,18 +7,25 @@ import re
 import keys
 import json
 from typing import Tuple
+from engine import redis_client
 
 openai.api_key = keys.OPEN_API_KEY
 
-def getPrompt(user_input: str) -> Tuple[str, bool]:
+def getPrompt(user_input: str, first: bool) -> Tuple[str, bool]:
     """
         Takes in user response and gives thw assistant's 
         response
 
         Args:
             user_input: User's question
+            first: wants the first question/prompt
     """
     assesment = False
+
+    # check if first and clear all content of the list to be used
+    if first:
+        redis_client.delete('chat_log')
+
     user_message = {'role': 'user', 'content': user_input}
     redis_client.addToList('chat_log', user_message)
 

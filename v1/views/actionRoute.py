@@ -58,7 +58,7 @@ def getFirstQuestion(studyId):
         start_question = keys.QUERY_STRING.format(study_year, study_level,
                                                 study_interest, country)
 
-        prompt = getPrompt(start_question)
+        prompt = getPrompt(start_question, True)
         return jsonify({ 'prompt': prompt[0] }), 200
 
     if request.method == 'PUT':
@@ -70,7 +70,7 @@ def getFirstQuestion(studyId):
         if answer is None:
             abort(400)
 
-        prompt = getPrompt(answer)
+        prompt = getPrompt(answer, False)
 
         if prompt[1]:
             obj = {"_id": ObjectId(studyId)}

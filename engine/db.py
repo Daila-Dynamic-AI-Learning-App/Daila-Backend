@@ -42,7 +42,7 @@ class Db:
         field = self.__db[collection]
         return field.find_one_and_update(obj, update, return_document=ReturnDocument.AFTER)
 
-    def getFieldList(self, collection: str, match_obj: Dict, limit: int, page: int):
+    def getFieldList(self, collection: str, match_obj: Dict, limit: int, page: int, proj):
         """
             get a paginated list of matching object results
             without the id
@@ -52,6 +52,7 @@ class Db:
                 match_obj: object to get match results from
                 limit: limit of results gotten
                 page: number to display a particular page
+                proj: object that controls what to see
         """
         field = self.__db[collection]
         # define the pipeline to search mongodb
@@ -60,10 +61,14 @@ class Db:
             { '$skip': page * limit },
             { '$limit': limit },
             { '$sort': { 'created_at': -1 } },
-            { '$project': { '_id': 0 } }
+            { '$project': proj }
         ]
         return field.aggregate(pipeline)
-
-# data_b = Db()
-# elem = data_b.addOne('user', { 'name': 'foo', 'email': 'goo@g.com' })
-# print(dir(elem))
+    
+    def delMany(self, collection, match_obj):
+        """
+            deletes all matches to an object passed
+            in
+        """
+        field = self.__db[collection]
+        field.delete_many(match_obj)

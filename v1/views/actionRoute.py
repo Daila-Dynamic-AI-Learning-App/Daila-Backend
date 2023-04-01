@@ -76,21 +76,3 @@ def getFirstQuestion(studyId):
             update = {'$set': { 'assessment': prompt[0], 'updated_at': datetime.now() }}
             study = database.findUpdateOne('study', obj, update)
         return jsonify({ 'prompt': prompt[0] }), 200
-
-# @daila.route('/user/studies', methods=['GET'], strict_slashes=False)
-# def listUserStudy():
-#     """
-#         Endpoint lists all assessment taken by
-#         the user
-#     """
-#     # get all the assessments taken by the user
-#     assessments = database.findAll('study', { 'userId': g.user_id })
-
-#     # get all the objects in cursor object
-#     assess_list = []
-#     for ass in assessments:
-#         ass['userId'] = str(ass.get('userId'))
-#         assess_list.append(ass)
-
-#     # return list of assessment for a user
-#     return jsonify(assessments=assess_list), 200

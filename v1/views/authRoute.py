@@ -9,7 +9,7 @@ def registerUser():
         register users
     """
     # convert to mutable dict
-    obj = dict(request.form)
+    obj = request.get_json()
     if not obj:
         abort(400)
     email = obj.get('email')
@@ -37,7 +37,6 @@ def loginUser():
     """
     # to be safer, load data to json
     data = request.get_json()
-    print(data)
     if not data:
         abort(400)
 

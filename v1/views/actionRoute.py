@@ -12,10 +12,12 @@ def studyDetails():
     """
         Gets the school details of user
     """
-    # get the details from the form
-    study_level = request.form.get('studyLevel') or None
-    topic_of_interest = request.form.get('topicOfInterest') or None
-    study_year = request.form.get('studyYear') or None
+    # get the details from the json
+    data = request.get_json()
+
+    study_level = data.get('studyLevel')
+    topic_of_interest = data.get('topicOfInterest')
+    study_year = data.get('studyYear')
 
     if not study_level or not topic_of_interest or not study_year:
         # log this error message

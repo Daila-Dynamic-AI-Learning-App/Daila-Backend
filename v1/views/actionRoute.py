@@ -17,7 +17,7 @@ def studyDetails():
     topic_of_interest = request.form.get('topicOfInterest') or None
     study_year = request.form.get('studyYear') or None
 
-    if not study_level and not topic_of_interest:
+    if not study_level or not topic_of_interest or not study_year:
         # log this error message
         abort(400)
 
@@ -43,6 +43,9 @@ def getFirstQuestion(studyId):
     """
         generates prompt from the details in study
     """
+    if studyId is None:
+        abort(400)
+
     if request.method == 'GET':
         # get the user object from db
         user = database.findOne('user', { '_id': ObjectId(g.user_id) })

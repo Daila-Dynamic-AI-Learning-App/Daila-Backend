@@ -12,7 +12,7 @@ def listUserStudy():
     # get limit and page query paramters
     limit = request.args.get('limit') or 5
     page = request.args.get('page') or 0
-    
+
     # typecast to int if limit or page is present
     limit = int(limit)
     page = int(page)
@@ -41,16 +41,16 @@ def getDelUsers():
         user_list = []
         for obj in user:
             user_list.append(obj)
-        
+
         # check if user is present in db
         if not user_list:
             abort(403)
         return jsonify(user=user_list[0]), 200
-    
+
     if request.method == 'DELETE':
         # first delete every relation to the user
         database.delMany('study', { 'userId': g.user_id })
-        
+
         # then delete the user
         database.delMany('user', { '_id': g.user_id })
         # delete token from redis

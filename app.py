@@ -5,7 +5,7 @@ from auth.tokenAuth import TokenAuth
 import keys
 
 app = Flask(__name__)
-CORS(app, resources={r"*": {"origins": "*"}})
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 app.register_blueprint(daila)
 
 
@@ -58,7 +58,7 @@ def forbidden(error):
         handles error for status code 404
     """
     message = 'Not Found'
-    return jsonify(error=message), 403
+    return jsonify(error=message), 404
 
 if __name__ == '__main__':
     app.run('0.0.0.0', 5001)

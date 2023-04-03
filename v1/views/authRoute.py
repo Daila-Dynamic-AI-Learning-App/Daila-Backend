@@ -13,6 +13,12 @@ def registerUser():
     if not obj:
         abort(400)
     email = obj.get('email')
+    country = obj.get('country')
+    password = obj.get('password')
+
+    if country is None or password is None:
+        abort(400)
+
     if not validateEmail(email):
         abort(400)
 

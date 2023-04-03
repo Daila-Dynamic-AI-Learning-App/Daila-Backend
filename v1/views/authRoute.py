@@ -29,7 +29,7 @@ def registerUser():
         # user already exists
         abort(400)
 
-@daila.route('/login', methods=['GET'], strict_slashes=False)
+@daila.route('/login', methods=['POST'], strict_slashes=False)
 def loginUser():
     """
         login users and returns a token

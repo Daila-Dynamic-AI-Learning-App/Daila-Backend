@@ -1,7 +1,7 @@
 from engine import database, redis_client
 from utils.helper import hash_password, generate_uuid
 from bcrypt import checkpw
-from datetime import datetime
+from models.user import User
 from typing import Dict
 
 
@@ -29,19 +29,14 @@ class Authorize:
         if self.__db.findOne('user', {"email": email}):
             raise ValueError(f"User {email} already exists")
 
-        created_at = datetime.now()
-        updated_at = datetime.now()
-
         hashed_password = hash_password(password)
         # add the hashed password to the obj to be stored
         obj['hashed_password'] = hashed_password.decode('utf8')
-        obj['created_at'] = created_at
-        obj['updated_at'] = updated_at
 
-        # delete the password in the obj
-        del obj['password']
+        # create user instance
+        user = User(**obj)
 
-        self.__db.addOne('user', obj)
+        self.__db.addOne('user', user.to_dict())
 
     def loginUser(self, obj: Dict) -> str:
         """

@@ -7,7 +7,7 @@ from utils.prompter import getPrompt
 from datetime import datetime
 from models.assessment import Assessment
 from models.study import Study
-from utils.test_assessment import getConversation, get_question_or_assessment
+from utils.prompter import getConversation, get_question_or_assessment
 
 
 @daila.route('/study', methods=['POST'], strict_slashes=False)

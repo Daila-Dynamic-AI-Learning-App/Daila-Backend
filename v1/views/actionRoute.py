@@ -7,6 +7,7 @@ from utils.prompter import getPrompt
 from datetime import datetime
 from models.assessment import Assessment
 from models.study import Study
+from utils.test_assessment import getConversation, get_question_or_assessment
 
 
 @daila.route('/study', methods=['POST'], strict_slashes=False)
@@ -17,16 +18,16 @@ def studyDetails():
     # get the details from the json
     data = request.get_json()
 
-    study_level = data.get('studyLevel')
+    # study_level = data.get('studyLevel')
     topic_of_interest = data.get('topicOfInterest')
     study_year = data.get('studyYear')
 
-    if not study_level or not topic_of_interest or not study_year:
+    if not topic_of_interest or not study_year:
         # log this error message
         abort(400)
 
     # link present studyguide with the user
-    study_dict = {"level": study_level, "interest": topic_of_interest,
+    study_dict = {"interest": topic_of_interest,
                   "year": study_year, "assessment_id": None, "user_id": g.user_id}
 
     # create the study collection
@@ -53,15 +54,22 @@ def getFirstQuestion(studyId):
         # get the study object from db
         study = database.findOne('study', {'_id': ObjectId(studyId)})
 
-        study_level = study.get('level')
+        # study_level = study.get('level')
         study_interest = study.get('interest')
         study_year = study.get('year')
         country = user.get('country')
 
-        start_question = keys.QUERY_STRING.format(study_year, study_level,
-                                                  study_interest, country)
+        start_question = keys.QUERY_STRING.format(study_year, study_interest,
+                                                  country, country)
 
-        prompt = getPrompt(start_question, True)
+        # prompt = getPrompt(start_question, True)
+        # return jsonify({'prompt': prompt[0]}), 200
+
+        # get the conversation
+        convo = getConversation()
+
+        # get the first question
+        prompt = get_question_or_assessment(convo, start_question, False)
         return jsonify({'prompt': prompt[0]}), 200
 
     if request.method == 'PUT':
@@ -73,14 +81,14 @@ def getFirstQuestion(studyId):
         if answer is None:
             abort(400)
 
-        prompt = getPrompt(answer, False)
+        question = get_question_or_assessment(convo, answer, False)
 
         # if prompt[1] is true, then the assessment is complete
-        if prompt[1]:
+        if question[1]:
             obj = {"_id": ObjectId(studyId)}
 
             # create the assessment collection
-            val_assessment = {"assessment": prompt[0],
+            val_assessment = {"assessment": question[0],
                               "user_id": g.user_id}
             asssessment = Assessment(**val_assessment)
 
@@ -95,4 +103,4 @@ def getFirstQuestion(studyId):
                 '$set': {'assessment_id': assessment.get('_id'), 'updated_at': datetime.now()}}
             study = database.findUpdateOne('study', obj, update)
             end = True
-        return jsonify({'prompt': prompt[0], 'end': end}), 200
+        return jsonify({'prompt': question[0], 'end': end}), 200

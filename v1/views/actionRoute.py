@@ -3,11 +3,13 @@ from flask import abort, jsonify, request, g
 from engine import database
 import keys
 from bson import ObjectId
-from utils.prompter import getPrompt
 from datetime import datetime
 from models.assessment import Assessment
 from models.study import Study
 from utils.prompter import getConversation, get_question_or_assessment
+
+# Store conversation chain object
+CONVERSE = []
 
 
 @daila.route('/study', methods=['POST'], strict_slashes=False)
@@ -18,7 +20,6 @@ def studyDetails():
     # get the details from the json
     data = request.get_json()
 
-    # study_level = data.get('studyLevel')
     topic_of_interest = data.get('topicOfInterest')
     study_year = data.get('studyYear')
 
@@ -34,9 +35,8 @@ def studyDetails():
     study = Study(**study_dict)
 
     # get the study obj after adding
-    database.addOne('study', study.to_dict())
-    study = database.findOne('study', {'user_id': g.user_id})
-    return jsonify({'studyId': str(study.get('_id'))}), 202
+    result = database.addOne('study', study.to_dict())
+    return jsonify({'studyId': str(result.inserted_id)}), 202
 
 
 @daila.route('/question/<studyId>', methods=['GET', 'PUT'], strict_slashes=False)
@@ -54,7 +54,6 @@ def getFirstQuestion(studyId):
         # get the study object from db
         study = database.findOne('study', {'_id': ObjectId(studyId)})
 
-        # study_level = study.get('level')
         study_interest = study.get('interest')
         study_year = study.get('year')
         country = user.get('country')
@@ -62,14 +61,15 @@ def getFirstQuestion(studyId):
         start_question = keys.QUERY_STRING.format(study_year, study_interest,
                                                   country, country)
 
-        # prompt = getPrompt(start_question, True)
-        # return jsonify({'prompt': prompt[0]}), 200
+        # clear the CONVERSE list if it is not empty
+        if len(CONVERSE) > 0:
+            CONVERSE.clear()
 
-        # get the conversation
-        convo = getConversation()
+        # get and set the conversation in the CONVERSE list
+        CONVERSE.append(getConversation())
 
         # get the first question
-        prompt = get_question_or_assessment(convo, start_question, False)
+        prompt = get_question_or_assessment(CONVERSE[0], start_question, False)
         return jsonify({'prompt': prompt[0]}), 200
 
     if request.method == 'PUT':
@@ -81,11 +81,18 @@ def getFirstQuestion(studyId):
         if answer is None:
             abort(400)
 
-        question = get_question_or_assessment(convo, answer, False)
+        # check if the CONVERSE list is empty
+        if len(CONVERSE) == 0:
+            abort(400)
+
+        question = get_question_or_assessment(CONVERSE[0], answer, False)
 
         # if prompt[1] is true, then the assessment is complete
         if question[1]:
             obj = {"_id": ObjectId(studyId)}
+
+            # empty the CONVERSE list
+            CONVERSE.clear()
 
             # create the assessment collection
             val_assessment = {"assessment": question[0],

@@ -37,12 +37,16 @@ def getConversation() -> ConversationChain:
 
 def get_question_or_assessment(convo: ConversationChain, input: str, assess: bool):
     """
-        Function gets question or assessment string
+        Function gets question or assesposment string
     """
     q_or_assess = convo.predict(input=input)
 
-    if q_or_assess.startswith('End$'):
-        final_assessment = q_or_assess[len('End$'):].strip()
+    if 'End$' in q_or_assess:
+        # get the index of the end$ string and take only the area from after the end$ string
+        index = q_or_assess.index('End$') + 4
+
+        # get the final assessment
+        final_assessment = q_or_assess[index:].strip()
         return (final_assessment, True)
     
     # final assessment has not been reached
@@ -50,4 +54,4 @@ def get_question_or_assessment(convo: ConversationChain, input: str, assess: boo
     question = re.findall(pattern, q_or_assess)
 
     # return Question free from whitespaces
-    return (question.strip(), False)
+    return (question[0].strip(), False)

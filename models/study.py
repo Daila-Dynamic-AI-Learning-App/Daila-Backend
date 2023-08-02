@@ -4,7 +4,7 @@
 from models.basemodel import BaseModel
 
 
-DATA = ["assessment_id", "user_id", "level", "interest", "year"]
+DATA = ["assessment_id", "user_id", "interest", "year"]
 
 
 class Study(BaseModel):
@@ -26,7 +26,6 @@ class Study(BaseModel):
         return {
             'assessment_id': self.assessment_id,
             'user_id': self.user_id,
-            'level': self.level,
             'interest': self.interest,
             'year': self.year,
             'created_at': self.created_at,

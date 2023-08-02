@@ -12,7 +12,7 @@ class Db:
             adds a collection with obj to the database
         """
         field = self.__db[collection]
-        field.insert_one(obj)
+        return field.insert_one(obj)
 
     def findOne(self, collection: str, obj: Dict) -> Union[Any, None]:
         """
